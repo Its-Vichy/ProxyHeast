@@ -13,6 +13,19 @@ class Database:
             
         return list(set(proxy_list))
     
+    def save_proxy(self):
+        proxy_list = []
+
+        for proxy in self.database.find({}):
+            proxy_list.append(f'{proxy["protocols"][0]}://{proxy["ip"]}:{proxy["port"]}')
+        
+        with open('./save.txt', 'a+') as file:
+            file.truncate(0) 
+
+        with open('./save.txt', 'a+') as pf:
+            for proxy in list(set(proxy_list)):
+                pf.write(proxy + '\n')
+    
     def add_raw_proxy(self, proxy_list):
         for proxy in proxy_list:
             try:
@@ -25,7 +38,7 @@ class Database:
         self.client['proxies']['info'].insert_one({'updated_at': datetime.datetime.utcnow()})
         self.add_raw_proxy(proxy_list)
     
-        print(f'{colorama.Fore.WHITE}[{Fore.GREEN}+{colorama.Fore.WHITE}] Proxy added to database.')
+        print(f'{colorama.Fore.WHITE}[{colorama.Fore.GREEN}+{colorama.Fore.WHITE}] Proxy added to database.')
 
 class Console:
     def __init__(self):
@@ -262,8 +275,10 @@ class Checker:
 
 if __name__ == '__main__':
     console = Console()
-    database = Database('database url here')
+    database = Database('database url')
     scraper = Scrapper(console, database)
 
+    database.save_proxy()
     while True:
         Checker(console, scraper.scrape_proxies(), database).start_checker()
+        database.save_proxy()
