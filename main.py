@@ -171,6 +171,8 @@ class Scrapper:
                     for i in range(len(proxies)):
                         res = proxies[i].findChildren(recursive = False)[0].text.strip()
 
+                        console.printer(colorama.Fore.YELLOW, '*', f'Scrape https://proxylist.live/dashboard/{protocol}?page={page}')
+
                         if res != 'Proxy':
                             proxy_found.append(res)
                         
@@ -194,6 +196,7 @@ class Scrapper:
     def scrape_url(self, url):
         found_proxy = []
         try:
+            console.printer(colorama.Fore.YELLOW, '*', f'Scrape {url}')
             for proxy in requests.get(url).text.split('\n'):
                 found_proxy.append(proxy.split('\n')[0].replace('\r', ''))
             
